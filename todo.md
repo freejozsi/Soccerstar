@@ -39,6 +39,16 @@
 - [x] Battery optimization (frame throttling)
 - [x] Háttér service lifecycle
 
+## Lebegő Ablak Implementáció
+- [x] OverlayWindowService (WindowManager)
+- [x] DraggableOverlayView (Canvas rendering)
+- [x] Touch handling (drag + interact)
+- [x] OverlayModule (Expo integráció)
+- [x] use-overlay hook (React)
+- [x] overlay.tsx integráció
+- [x] AndroidManifest.xml (service registration)
+- [x] Foreground notification
+
 ## Build & Deploy
 - [x] APK generálás (Expo prebuild)
 - [x] Android 10+ compatibility (API 29+)

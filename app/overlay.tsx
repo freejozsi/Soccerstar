@@ -6,20 +6,18 @@ import {
   TouchableOpacity,
   Dimensions,
   Platform,
-  NativeModules,
 } from 'react-native';
-import Svg, { Polyline, Circle, Rect, Line, Text as SvgText } from 'react-native-svg';
+import Svg, { Polyline, Circle, Rect, Text as SvgText } from 'react-native-svg';
 import Slider from '@react-native-community/slider';
 import * as Haptics from 'expo-haptics';
 import { simulateTrajectory, forceToVelocity, DEFAULT_PHYSICS } from '../lib/physics';
-
-const { ScreenCapture } = NativeModules;
+import { useOverlay } from '../hooks/use-overlay';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const SCREEN_HEIGHT = Dimensions.get('window').height;
 
 export default function OverlayScreen() {
-  const [isCapturing, setIsCapturing] = useState(false);
+  const { isActive, error, startOverlay, stopOverlay } = useOverlay();
   const [force, setForce] = useState(50);
   const [angle, setAngle] = useState(-45);
   const [trajectory, setTrajectory] = useState<any[]>([]);
@@ -27,7 +25,7 @@ export default function OverlayScreen() {
   const frameCountRef = useRef(0);
 
   useEffect(() => {
-    if (!isCapturing) return;
+    if (!isActive) return;
 
     const interval = setInterval(() => {
       // Simulate frame capture and analysis
@@ -59,34 +57,17 @@ export default function OverlayScreen() {
     }, 33); // ~30 FPS
 
     return () => clearInterval(interval);
-  }, [isCapturing, force, angle]);
+  }, [isActive, force, angle]);
 
-  const handleStartCapture = async () => {
-    if (Platform.OS === 'android') {
-      try {
-        await ScreenCapture.startScreenCapture();
-        setIsCapturing(true);
-        if (Platform.OS !== 'web') {
-          Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-        }
-      } catch (err) {
-        console.error('Failed to start screen capture:', err);
-      }
-    } else {
-      // Demo mode for non-Android
-      setIsCapturing(true);
+  const handleStartOverlay = async () => {
+    await startOverlay();
+    if (Platform.OS !== 'web') {
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     }
   };
 
-  const handleStopCapture = async () => {
-    if (Platform.OS === 'android') {
-      try {
-        await ScreenCapture.stopScreenCapture();
-      } catch (err) {
-        console.error('Failed to stop screen capture:', err);
-      }
-    }
-    setIsCapturing(false);
+  const handleStopOverlay = async () => {
+    await stopOverlay();
     setTrajectory([]);
   };
 
@@ -96,9 +77,7 @@ export default function OverlayScreen() {
 
   return (
     <View style={styles.container}>
-      {/* Canvas */}
       <Svg width={SCREEN_WIDTH} height={SCREEN_HEIGHT * 0.7} style={styles.canvas}>
-        {/* Field bounds */}
         {gameElements && (
           <>
             <Rect
@@ -112,7 +91,6 @@ export default function OverlayScreen() {
               strokeDasharray="5,5"
             />
 
-            {/* Trajectory */}
             {trajectory.length > 0 && (
               <Polyline
                 points={trajectoryPath}
@@ -124,7 +102,6 @@ export default function OverlayScreen() {
               />
             )}
 
-            {/* Ball */}
             <Circle
               cx={gameElements.ball.x}
               cy={gameElements.ball.y}
@@ -133,7 +110,6 @@ export default function OverlayScreen() {
               opacity="0.9"
             />
 
-            {/* Discs */}
             {gameElements.discs.map((disc: any) => (
               <g key={disc.id}>
                 <Circle
@@ -156,7 +132,6 @@ export default function OverlayScreen() {
               </g>
             ))}
 
-            {/* Goal */}
             {gameElements.goal && (
               <Rect
                 x={gameElements.goal.x}
@@ -171,7 +146,6 @@ export default function OverlayScreen() {
         )}
       </Svg>
 
-      {/* Control Panel */}
       <View style={styles.controlPanel}>
         <View style={styles.sliderGroup}>
           <Text style={styles.label}>Erő: {force}%</Text>
@@ -202,25 +176,26 @@ export default function OverlayScreen() {
         </View>
 
         <View style={styles.buttonGroup}>
-          {!isCapturing ? (
+          {!isActive ? (
             <TouchableOpacity
               style={[styles.button, styles.startBtn]}
-              onPress={handleStartCapture}
+              onPress={handleStartOverlay}
             >
-              <Text style={styles.buttonText}>Rögzítés indítása</Text>
+              <Text style={styles.buttonText}>Overlay indítása</Text>
             </TouchableOpacity>
           ) : (
             <TouchableOpacity
               style={[styles.button, styles.stopBtn]}
-              onPress={handleStopCapture}
+              onPress={handleStopOverlay}
             >
-              <Text style={styles.buttonText}>Rögzítés leállítása</Text>
+              <Text style={styles.buttonText}>Overlay leállítása</Text>
             </TouchableOpacity>
           )}
         </View>
 
+        {error && <Text style={styles.error}>{error}</Text>}
         <Text style={styles.stats}>
-          {isCapturing ? `FPS: ${frameCountRef.current}` : 'Offline'}
+          {isActive ? `⚽ Overlay aktív - FPS: ${frameCountRef.current}` : 'Offline'}
         </Text>
       </View>
     </View>
@@ -280,5 +255,11 @@ const styles = StyleSheet.create({
     color: '#58A6FF',
     fontSize: 12,
     marginTop: 12,
+  },
+  error: {
+    color: '#FF3366',
+    fontSize: 12,
+    marginTop: 8,
+    fontWeight: '600',
   },
 });
