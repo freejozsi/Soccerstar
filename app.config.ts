@@ -32,7 +32,7 @@ const env = {
   appSlug: "soccerstars-ai-overlay",
   // S3 URL of the app logo - set this to the URL returned by generate_image when creating custom logo
   // Leave empty to use the default icon from assets/images/icon.png
-  logoUrl: "https://d2xsxph8kpxj0f.cloudfront.net/310519663619043427/dg7jyK2e4dqErKgGmoyRea/icon-6rZFc3quC6R7zsKgjekJpb.png",
+  logoUrl: "",
   scheme: schemeFromBundleId,
   iosBundleId: bundleId,
   androidPackage: bundleId,
@@ -64,7 +64,7 @@ const config: ExpoConfig = {
     edgeToEdgeEnabled: true,
     predictiveBackGestureEnabled: false,
     package: env.androidPackage,
-    permissions: ["POST_NOTIFICATIONS", "READ_EXTERNAL_STORAGE", "WRITE_EXTERNAL_STORAGE"],
+    permissions: ["POST_NOTIFICATIONS"],
     intentFilters: [
       {
         action: "VIEW",
@@ -86,13 +86,6 @@ const config: ExpoConfig = {
   },
   plugins: [
     "expo-router",
-    [
-      "expo-image-picker",
-      {
-        photosPermission: "Allow $(PRODUCT_NAME) to access your photos to analyze game screenshots.",
-        cameraPermission: "Allow $(PRODUCT_NAME) to use the camera to capture game screenshots.",
-      },
-    ],
     [
       "expo-audio",
       {

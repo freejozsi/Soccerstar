@@ -9,47 +9,21 @@ type IconMapping = Record<SymbolViewProps["name"], ComponentProps<typeof Materia
 type IconSymbolName = keyof typeof MAPPING;
 
 /**
- * SF Symbols to Material Icons mappings for SoccerStars AI Overlay
+ * Add your SF Symbols to Material Icons mappings here.
+ * - see Material Icons in the [Icons Directory](https://icons.expo.fyi).
+ * - see SF Symbols in the [SF Symbols](https://developer.apple.com/sf-symbols/) app.
  */
 const MAPPING = {
-  // Navigation
   "house.fill": "home",
   "paperplane.fill": "send",
   "chevron.left.forwardslash.chevron.right": "code",
   "chevron.right": "chevron-right",
-  "chevron.left": "chevron-left",
-  // App-specific
-  "viewfinder": "center-focus-strong",
-  "camera.fill": "camera-alt",
-  "gearshape.fill": "settings",
-  "gearshape": "settings",
-  "play.fill": "play-arrow",
-  "stop.fill": "stop",
-  "arrow.counterclockwise": "refresh",
-  "xmark": "close",
-  "xmark.circle.fill": "cancel",
-  "checkmark.circle.fill": "check-circle",
-  "exclamationmark.triangle.fill": "warning",
-  "info.circle": "info",
-  "slider.horizontal.3": "tune",
-  "bolt.fill": "bolt",
-  "target": "my-location",
-  "scope": "gps-fixed",
-  "wand.and.stars": "auto-fix-high",
-  "hand.tap.fill": "touch-app",
-  "sportscourt.fill": "sports-soccer",
-  "circle.fill": "circle",
-  "square.fill": "square",
-  "line.diagonal": "show-chart",
-  "photo.fill": "photo",
-  "photo.on.rectangle.angled": "photo-library",
-  "trash.fill": "delete",
-  "plus.circle.fill": "add-circle",
-  "minus.circle.fill": "remove-circle",
 } as IconMapping;
 
 /**
  * An icon component that uses native SF Symbols on iOS, and Material Icons on Android and web.
+ * This ensures a consistent look across platforms, and optimal resource usage.
+ * Icon `name`s are based on SF Symbols and require manual mapping to Material Icons.
  */
 export function IconSymbol({
   name,
